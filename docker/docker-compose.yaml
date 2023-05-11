@@ -1,0 +1,42 @@
+#
+# Copyright the State of the Netherlands
+#
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU Affero General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU Affero General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with this program.  If not, see http://www.gnu.org/licenses/.
+#
+
+version: "3"
+
+services:
+
+  auth-database:
+    image: postgis/postgis:15-3.3-alpine
+    restart: unless-stopped
+    environment:
+      - POSTGRES_DB=aerius_authorization
+      - POSTGRES_USER=${DATABASE_USERNAME}
+      - POSTGRES_PASSWORD=${DATABASE_USERNAME}
+    volumes:
+      - /etc/localtime:/etc/localtime:ro
+
+  auth:
+    build:
+      context: .
+      dockerfile: docker/service/Dockerfile
+    image: ${REGISTRY_URL}auth:${IMAGE_TAG}
+    restart: unless-stopped
+    environment:
+      - TZ=${AERIUS_TIMEZONE}
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://auth-database/aerius_authorization
+      - SPRING_DATASOURCE_USERNAME=${DATABASE_USERNAME}
+      - SPRING_DATASOURCE_PASSWORD=${DATABASE_PASSWORD}
