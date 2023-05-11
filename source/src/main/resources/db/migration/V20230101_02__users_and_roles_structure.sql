@@ -69,7 +69,7 @@ CREATE TABLE roles (
 );
 
 /* [jooq ignore start] */
-ALTER TABLE roles CONSTRAINT roles_unique_code UNIQUE (code);
+ALTER TABLE roles ADD CONSTRAINT roles_unique_code UNIQUE (code);
 /* [jooq ignore stop] */
 
 /*
