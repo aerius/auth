@@ -1,0 +1,2 @@
+# Ignore expanded docker-compose file
+docker-compose.expanded.yaml
