@@ -32,6 +32,8 @@
   <description>Authorization project for AERIUS</description>
 
   <properties>
+    <sonar.projectKey>aerius_file-server</sonar.projectKey>
+
     <build-helper-maven-plugin.version>3.3.0</build-helper-maven-plugin.version>
     <flyway-maven-plugin.version>3.0</flyway-maven-plugin.version>
     <jooq-codegen-maven.version>3.17.12</jooq-codegen-maven.version>
