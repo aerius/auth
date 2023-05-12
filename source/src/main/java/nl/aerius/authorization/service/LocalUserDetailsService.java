@@ -50,6 +50,7 @@ public class LocalUserDetailsService implements UserDetailsService {
         .withUsername(dbUser.getUsername())
         .password(dbUser.getPassword())
         .authorities(List.of())
+        .disabled(!dbUser.getEnabled())
         .build();
   }
 
