@@ -36,7 +36,7 @@ services:
     image: ${REGISTRY_URL}auth:${IMAGE_TAG}
     restart: unless-stopped
     environment:
-      - TZ=${AERIUS_TIMEZONE}
+      - TZ=${TIMEZONE}
       - SPRING_DATASOURCE_URL=jdbc:postgresql://auth-database/aerius_authorization
       - SPRING_DATASOURCE_USERNAME=${DATABASE_USERNAME}
       - SPRING_DATASOURCE_PASSWORD=${DATABASE_PASSWORD}
