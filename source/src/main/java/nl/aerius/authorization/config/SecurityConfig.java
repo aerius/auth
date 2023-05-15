@@ -63,6 +63,9 @@ public class SecurityConfig {
   @Value("${aerius.authorization.clients.register.redirecturi:http://127.0.0.1:8080/authorized}")
   private final List<String> registerRedirectUris = new ArrayList<>();
 
+  @Value("${aerius.authorization.server.issuer:}")
+  private String issuer;
+
   @Bean
   @Order(1)
   public SecurityFilterChain authorizationServerSecurityFilterChain(final HttpSecurity http)
@@ -152,7 +155,11 @@ public class SecurityConfig {
 
   @Bean
   public AuthorizationServerSettings authorizationServerSettings() {
-    return AuthorizationServerSettings.builder().build();
+    final AuthorizationServerSettings.Builder builder = AuthorizationServerSettings.builder();
+    if (issuer != null && !issuer.isEmpty()) {
+      builder.issuer(issuer);
+    }
+    return builder.build();
   }
 
 }
