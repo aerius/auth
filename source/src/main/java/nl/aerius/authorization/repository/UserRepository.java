@@ -57,4 +57,16 @@ public class UserRepository {
         .fetchSet(Tables.ROLES.CODE);
   }
 
+  public Set<String> retrieveCompetentAuthorities(final String identityProvider, final String userReference) {
+    return this.context.select(Tables.COMPETENT_AUTHORITIES.CODE)
+        .from(Tables.COMPETENT_AUTHORITIES)
+        .join(Tables.USER_COMPETENT_AUTHORITIES).using(Tables.USER_COMPETENT_AUTHORITIES.COMPETENT_AUTHORITY_ID)
+        .join(Tables.USERS).using(Tables.USERS.USER_ID)
+        .join(Tables.IDENTITY_PROVIDERS).using(Tables.IDENTITY_PROVIDERS.IDENTITY_PROVIDER_ID)
+        .where(
+            Tables.IDENTITY_PROVIDERS.NAME.eq(identityProvider),
+            Tables.USERS.IDENTITY_PROVIDER_REFERENCE.eq(userReference))
+        .fetchSet(Tables.COMPETENT_AUTHORITIES.CODE);
+  }
+
 }

@@ -55,23 +55,22 @@ public class TokenCustomizer implements OAuth2TokenCustomizer<JwtEncodingContext
   private Set<String> determineRoles(final Authentication authentication) {
     final Object principal = authentication.getPrincipal();
     // No clue yet how this'll work for federated users (perhaps using OAuth2User as first check?), so for now only local
-    if (principal instanceof User) {
+    if (principal instanceof final User user) {
       // Assume local user, and retrieve roles accordingly
-      return repository.retrieveUserRoles("local", ((User) principal).getUsername());
+      return repository.retrieveUserRoles("local", user.getUsername());
     } else {
       return Set.of();
     }
   }
 
   private Set<String> determineAuthorities(final Authentication authentication) {
-    // TODO: actual implementation where authorities are retrieved from database.
-    final Set<String> aeriusAuthorities;
-    if ("testeditor".equals(authentication.getName())) {
-      aeriusAuthorities = Set.of("mocked_authority_code_1", "mocked_authority_code_2");
+    final Object principal = authentication.getPrincipal();
+    if (principal instanceof final User user) {
+      // Assume local user, and retrieve authorities accordingly
+      return repository.retrieveCompetentAuthorities("local", user.getUsername());
     } else {
-      aeriusAuthorities = Set.of("mocked_authority_code_1");
+      return Set.of();
     }
-    return aeriusAuthorities;
   }
 
 }
