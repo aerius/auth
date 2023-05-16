@@ -38,9 +38,19 @@ To create a user, there is a convenience method `auth.ae_create_local_user`. Tha
 -- Second argument: The bcrypt encrypted password, without method prefix (this is added by the function).
 -- Third argument: the role name, should match the code in auth.roles table.
 SELECT auth.ae_create_local_user(
-	'someUserName', 
-	'$2a$12$sG0hLLmx3/3Mjts69Y1Lp.B.EXCH51dnUxkRPXQ2RJ8tsrbU4OsqS', 
+	'someUserName',
+	'$2a$12$sG0hLLmx3/3Mjts69Y1Lp.B.EXCH51dnUxkRPXQ2RJ8tsrbU4OsqS',
 	'ROLE_NAME');
+```
+
+To link a user to a competent authority, there is a convenience method ``. That can be used as such:
+
+```sql
+-- First argument: username
+-- Second argument: the authority code, should match the code in auth.competent_authorities table.
+SELECT auth.ae_link_local_user_authority(
+	'someUserName',
+	'SOME_AUTHORITY_CODE');
 ```
 
 ## Running

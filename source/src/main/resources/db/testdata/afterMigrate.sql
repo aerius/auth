@@ -30,3 +30,17 @@ SELECT
 		AND users.identity_provider_reference = 'testviewer'
 		AND roles.code = 'VIEWER'
 	ON CONFLICT DO NOTHING;
+
+INSERT INTO auth.user_competent_authorities (user_id, competent_authority_id)
+SELECT
+	user_id,
+	competent_authority_id
+
+	FROM auth.users
+		INNER JOIN auth.identity_providers USING (identity_provider_id)
+	CROSS JOIN auth.competent_authorities
+	
+	WHERE identity_providers.name = 'local'
+		AND users.identity_provider_reference = 'testviewer'
+		AND competent_authorities.code = 'PROVINCIE_OVERIJSSEL'
+	ON CONFLICT DO NOTHING;
