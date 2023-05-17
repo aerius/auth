@@ -85,6 +85,110 @@ class UserRepositoryTest {
   }
 
   @Test
+  void testRetrieveIdentityProviderId() {
+    final MockDataProvider provider = (ctx) -> {
+      final String sql = ctx.sql();
+      assertEquals("""
+          select \
+          "auth"."identity_providers"."identity_provider_id" \
+          from "auth"."identity_providers" \
+          where lower("auth"."identity_providers"."name") = lower(?)""", sql, "Expected SQL");
+      // Mock 1 match
+      final DSLContext create = DSL.using(SQLDialect.POSTGRES);
+      final Record1<Integer> record = create.newRecord(Tables.IDENTITY_PROVIDERS.IDENTITY_PROVIDER_ID)
+          .values(1);
+      return new MockResult[] {new MockResult(record)};
+    };
+    final MockConnection connection = new MockConnection(provider);
+    final DSLContext context = DSL.using(connection, SQLDialect.POSTGRES);
+    final UserRepository userRepository = new UserRepository(context);
+
+    final Optional<Integer> result = userRepository.retrieveIdentityProviderId("SomeName");
+
+    assertTrue(result.isPresent(), "Identity provider should exist");
+    assertEquals(1, result.get(), "Identity provider ID should match what is returned");
+  }
+
+  @Test
+  void testRetrieveIdentityProviderIdNotExisting() {
+    final MockDataProvider provider = (ctx) -> {
+      // Mock no match
+      final DSLContext create = DSL.using(SQLDialect.POSTGRES);
+      return new MockResult[] {new MockResult(0, create.newResult(Tables.IDENTITY_PROVIDERS.IDENTITY_PROVIDER_ID))};
+    };
+    final MockConnection connection = new MockConnection(provider);
+    final DSLContext context = DSL.using(connection, SQLDialect.POSTGRES);
+    final UserRepository userRepository = new UserRepository(context);
+
+    final Optional<Integer> result = userRepository.retrieveIdentityProviderId("SomeName");
+
+    assertFalse(result.isPresent(), "Identity provider shouldn't exist");
+  }
+
+  @Test
+  void testRetrieveIdentityProviderUserId() {
+    final MockDataProvider provider = (ctx) -> {
+      final String sql = ctx.sql();
+      assertEquals("""
+          select \
+          "auth"."users"."user_id" \
+          from "auth"."users" \
+          join "auth"."identity_providers" using ("identity_provider_id") \
+          where (lower("auth"."identity_providers"."name") = lower(?) \
+          and "auth"."users"."identity_provider_reference" = ?)""", sql, "Expected SQL");
+      // Mock 1 match
+      final DSLContext create = DSL.using(SQLDialect.POSTGRES);
+      final Record1<Integer> record = create.newRecord(Tables.USERS.USER_ID)
+          .values(1);
+      return new MockResult[] {new MockResult(record)};
+    };
+    final MockConnection connection = new MockConnection(provider);
+    final DSLContext context = DSL.using(connection, SQLDialect.POSTGRES);
+    final UserRepository userRepository = new UserRepository(context);
+
+    final Optional<Integer> result = userRepository.retrieveIdentityProviderUserId("SomeIdentityId", "SomeUserReference");
+
+    assertTrue(result.isPresent(), "Identity provider user should exist");
+    assertEquals(1, result.get(), "Identity provider user ID should match what is returned");
+  }
+
+  @Test
+  void testRetrieveIdentityProviderUserIdNotExisting() {
+    final MockDataProvider provider = (ctx) -> {
+      final DSLContext create = DSL.using(SQLDialect.POSTGRES);
+      return new MockResult[] {new MockResult(0, create.newResult(Tables.USERS.USER_ID))};
+    };
+    final MockConnection connection = new MockConnection(provider);
+    final DSLContext context = DSL.using(connection, SQLDialect.POSTGRES);
+    final UserRepository userRepository = new UserRepository(context);
+
+    final Optional<Integer> result = userRepository.retrieveIdentityProviderUserId("SomeIdentityId", "SomeUserReference");
+
+    assertFalse(result.isPresent(), "Identity provider user shouldn't exist");
+  }
+
+  @Test
+  void testPersistNewFederatedUser() {
+    final MockDataProvider provider = (ctx) -> {
+      final String sql = ctx.sql();
+      assertEquals("""
+          insert into "auth"."users" \
+          ("identity_provider_id", "identity_provider_reference", "name") \
+          values \
+          (?, ?, ?)""", sql, "Expected SQL");
+      // Mock 1 match
+      return new MockResult[] {new MockResult(1)};
+    };
+    final MockConnection connection = new MockConnection(provider);
+    final DSLContext context = DSL.using(connection, SQLDialect.POSTGRES);
+    final UserRepository userRepository = new UserRepository(context);
+
+    final int recordsCreated = userRepository.persistNewFederatedUser(1, "SomeUserReference", "SomeUserName");
+
+    assertEquals(1, recordsCreated, "Records created");
+  }
+
+  @Test
   void testRetrieveUserRoles() {
     final MockDataProvider provider = (ctx) -> {
       final String sql = ctx.sql();

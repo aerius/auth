@@ -44,12 +44,15 @@ import org.springframework.security.oauth2.server.authorization.settings.Authori
 import org.springframework.security.oauth2.server.authorization.settings.ClientSettings;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.LoginUrlAuthenticationEntryPoint;
+import org.springframework.security.web.authentication.SavedRequestAwareAuthenticationSuccessHandler;
 
 import com.nimbusds.jose.jwk.JWKSet;
 import com.nimbusds.jose.jwk.RSAKey;
 import com.nimbusds.jose.jwk.source.ImmutableJWKSet;
 import com.nimbusds.jose.jwk.source.JWKSource;
 import com.nimbusds.jose.proc.SecurityContext;
+
+import nl.aerius.authorization.federation.FederatedAuthenticationSuccessHandler;
 
 @Configuration
 public class SecurityConfig {
@@ -65,6 +68,12 @@ public class SecurityConfig {
 
   @Value("${aerius.authorization.server.issuer:}")
   private String issuer;
+
+  @Value("${aerius.authorization.formlogin:true}")
+  private boolean useFormLogin;
+
+  @Value("${aerius.authorization.federation:false}")
+  private boolean useFederation;
 
   @Bean
   @Order(1)
@@ -87,14 +96,21 @@ public class SecurityConfig {
 
   @Bean
   @Order(2)
-  public SecurityFilterChain defaultSecurityFilterChain(final HttpSecurity http)
+  public SecurityFilterChain defaultSecurityFilterChain(final HttpSecurity http,
+      final FederatedAuthenticationSuccessHandler authenticationSuccessHandler)
       throws Exception {
     http
         // Ensure cors gets handled properly
         .cors().and()
-        .authorizeHttpRequests(authorize -> authorize.anyRequest().authenticated())
-        // Form login handles the redirect to the login page from the authorization server filter chain
-        .formLogin(Customizer.withDefaults());
+        .authorizeHttpRequests(authorize -> authorize.anyRequest().authenticated());
+    if (useFormLogin) {
+      // Form login handles the redirect to the login page from the authorization server filter chain
+      http.formLogin(Customizer.withDefaults());
+    }
+    if (useFederation) {
+      http.oauth2Login()
+          .successHandler(authenticationSuccessHandler);
+    }
 
     return http.build();
   }
@@ -160,6 +176,11 @@ public class SecurityConfig {
       builder.issuer(issuer);
     }
     return builder.build();
+  }
+
+  @Bean
+  public SavedRequestAwareAuthenticationSuccessHandler savedRequestAwareAuthenticationSuccessHandler() {
+    return new SavedRequestAwareAuthenticationSuccessHandler();
   }
 
 }
