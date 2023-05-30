@@ -57,14 +57,20 @@ import nl.aerius.authorization.federation.FederatedAuthenticationSuccessHandler;
 @Configuration
 public class SecurityConfig {
 
-  @Value("${aerius.authorization.clients.register.id:register-client}")
-  private String registerClientId;
+  @Value("${aerius.authorization.clients.register-api.id:register-client}")
+  private String registerApiClientId;
 
-  @Value("${aerius.authorization.clients.register.secret:{noop}registerssecret}")
-  private String registerClientSecret;
+  @Value("${aerius.authorization.clients.register-api.secret:{noop}registerssecret}")
+  private String registerApiClientSecret;
 
-  @Value("${aerius.authorization.clients.register.redirecturi:http://127.0.0.1:8080/authorized}")
-  private final List<String> registerRedirectUris = new ArrayList<>();
+  @Value("${aerius.authorization.clients.register-api.redirecturi:http://127.0.0.1:8080/authorized}")
+  private final List<String> registerApiRedirectUris = new ArrayList<>();
+
+  @Value("${aerius.authorization.clients.register-ui.id:register-client}")
+  private String registerUIClientId;
+
+  @Value("${aerius.authorization.clients.register-ui.redirecturi:http://127.0.0.1:8080/authorized}")
+  private final List<String> registerUIRedirectUris = new ArrayList<>();
 
   @Value("${aerius.authorization.server.issuer:}")
   private String issuer;
@@ -117,10 +123,37 @@ public class SecurityConfig {
 
   @Bean
   public RegisteredClientRepository registeredClientRepository() {
+    final RegisteredClient apiClient = getRegisterApiClient();
+    final RegisteredClient uiClient = getRegisterUIClient();
+
+    return new InMemoryRegisteredClientRepository(apiClient, uiClient);
+  }
+
+  private RegisteredClient getRegisterUIClient() {
+    final RegisteredClient.Builder registerUIClientBuilder = RegisteredClient.withId(UUID.randomUUID().toString())
+        .clientId(registerUIClientId)
+        .clientAuthenticationMethod(ClientAuthenticationMethod.NONE)
+        .authorizationGrantType(AuthorizationGrantType.AUTHORIZATION_CODE)
+        .authorizationGrantType(AuthorizationGrantType.REFRESH_TOKEN)
+        .scope(OidcScopes.OPENID)
+        .scope(OidcScopes.PROFILE)
+        .clientSettings(ClientSettings.builder()
+            .requireAuthorizationConsent(false)
+            .requireProofKey(true)
+            .build());
+
+    for (final String redirectUri : registerUIRedirectUris) {
+      registerUIClientBuilder.redirectUri(redirectUri);
+    }
+
+    return registerUIClientBuilder.build();
+  }
+
+  private RegisteredClient getRegisterApiClient() {
     // TODO: configure to what register actually needs
-    final RegisteredClient.Builder registeredClientBuilder = RegisteredClient.withId(UUID.randomUUID().toString())
-        .clientId(registerClientId)
-        .clientSecret(registerClientSecret)
+    final RegisteredClient.Builder registerApiClientBuilder = RegisteredClient.withId(UUID.randomUUID().toString())
+        .clientId(registerApiClientId)
+        .clientSecret(registerApiClientSecret)
         .clientAuthenticationMethod(ClientAuthenticationMethod.CLIENT_SECRET_BASIC)
         .clientAuthenticationMethod(ClientAuthenticationMethod.CLIENT_SECRET_POST)
         .authorizationGrantType(AuthorizationGrantType.AUTHORIZATION_CODE)
@@ -130,13 +163,11 @@ public class SecurityConfig {
         .scope(OidcScopes.PROFILE)
         .clientSettings(ClientSettings.builder().build());
 
-    for (final String redirectUri : registerRedirectUris) {
-      registeredClientBuilder.redirectUri(redirectUri);
+    for (final String redirectUri : registerApiRedirectUris) {
+      registerApiClientBuilder.redirectUri(redirectUri);
     }
 
-    final RegisteredClient registeredClient = registeredClientBuilder.build();
-
-    return new InMemoryRegisteredClientRepository(registeredClient);
+    return registerApiClientBuilder.build();
   }
 
   @Bean
