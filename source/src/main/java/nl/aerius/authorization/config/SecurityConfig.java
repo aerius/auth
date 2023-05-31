@@ -45,6 +45,7 @@ import org.springframework.security.oauth2.server.authorization.settings.ClientS
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.LoginUrlAuthenticationEntryPoint;
 import org.springframework.security.web.authentication.SavedRequestAwareAuthenticationSuccessHandler;
+import org.springframework.web.cors.CorsConfigurationSource;
 
 import com.nimbusds.jose.jwk.JWKSet;
 import com.nimbusds.jose.jwk.RSAKey;
@@ -83,7 +84,7 @@ public class SecurityConfig {
 
   @Bean
   @Order(1)
-  public SecurityFilterChain authorizationServerSecurityFilterChain(final HttpSecurity http)
+  public SecurityFilterChain authorizationServerSecurityFilterChain(final HttpSecurity http, final CorsConfigurationSource corsConfigurationSource)
       throws Exception {
     OAuth2AuthorizationServerConfiguration.applyDefaultSecurity(http);
     http.getConfigurer(OAuth2AuthorizationServerConfigurer.class)
@@ -91,11 +92,11 @@ public class SecurityConfig {
         .oidc(Customizer.withDefaults());
     http
         // Ensure cors gets handled properly
-        .cors().and()
+        .cors(c -> c.configurationSource(corsConfigurationSource))
         // Redirect to the login page when not authenticated from the authorization endpoint
         .exceptionHandling(exceptions -> exceptions.authenticationEntryPoint(new LoginUrlAuthenticationEntryPoint("/login")))
         // Accept access tokens for User Info
-        .oauth2ResourceServer(OAuth2ResourceServerConfigurer::jwt);
+        .oauth2ResourceServer(c -> c.jwt(Customizer.withDefaults()));
 
     return http.build();
   }
@@ -103,11 +104,12 @@ public class SecurityConfig {
   @Bean
   @Order(2)
   public SecurityFilterChain defaultSecurityFilterChain(final HttpSecurity http,
-      final FederatedAuthenticationSuccessHandler authenticationSuccessHandler)
+      final FederatedAuthenticationSuccessHandler authenticationSuccessHandler,
+      final CorsConfigurationSource corsConfigurationSource)
       throws Exception {
     http
         // Ensure cors gets handled properly
-        .cors().and()
+        .cors(c -> c.configurationSource(corsConfigurationSource))
         .authorizeHttpRequests(authorize -> authorize.anyRequest().authenticated());
     if (useFormLogin) {
       // Form login handles the redirect to the login page from the authorization server filter chain
