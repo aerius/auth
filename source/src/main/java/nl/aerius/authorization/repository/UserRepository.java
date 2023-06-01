@@ -45,6 +45,23 @@ public class UserRepository {
         .fetchOptional();
   }
 
+  public Optional<Integer> retrieveIdentityProviderId(final String identityProviderName) {
+    return this.context.select(Tables.IDENTITY_PROVIDERS.IDENTITY_PROVIDER_ID)
+        .from(Tables.IDENTITY_PROVIDERS)
+        .where(Tables.IDENTITY_PROVIDERS.NAME.equalIgnoreCase(identityProviderName))
+        .fetchOptional(Tables.IDENTITY_PROVIDERS.IDENTITY_PROVIDER_ID);
+  }
+
+  public Optional<Integer> retrieveIdentityProviderUserId(final String identityProviderName, final String userReference) {
+    return this.context.select(Tables.USERS.USER_ID)
+        .from(Tables.USERS)
+        .join(Tables.IDENTITY_PROVIDERS).using(Tables.IDENTITY_PROVIDERS.IDENTITY_PROVIDER_ID)
+        .where(
+            Tables.IDENTITY_PROVIDERS.NAME.equalIgnoreCase(identityProviderName),
+            Tables.USERS.IDENTITY_PROVIDER_REFERENCE.eq(userReference))
+        .fetchOptional(Tables.USERS.USER_ID);
+  }
+
   public Set<String> retrieveUserRoles(final String identityProvider, final String userReference) {
     return this.context.select(Tables.ROLES.CODE)
         .from(Tables.ROLES)
@@ -67,6 +84,13 @@ public class UserRepository {
             Tables.IDENTITY_PROVIDERS.NAME.eq(identityProvider),
             Tables.USERS.IDENTITY_PROVIDER_REFERENCE.eq(userReference))
         .fetchSet(Tables.COMPETENT_AUTHORITIES.CODE);
+  }
+
+  public int persistNewFederatedUser(final int identityProviderId, final String userReference, final String userName) {
+    return this.context.insertInto(Tables.USERS,
+        Tables.USERS.IDENTITY_PROVIDER_ID, Tables.USERS.IDENTITY_PROVIDER_REFERENCE, Tables.USERS.NAME)
+        .values(identityProviderId, userReference, userName)
+        .execute();
   }
 
 }

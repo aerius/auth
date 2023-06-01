@@ -21,6 +21,8 @@ import java.util.Set;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.userdetails.User;
+import org.springframework.security.oauth2.client.authentication.OAuth2AuthenticationToken;
+import org.springframework.security.oauth2.core.oidc.user.DefaultOidcUser;
 import org.springframework.security.oauth2.server.authorization.OAuth2TokenType;
 import org.springframework.security.oauth2.server.authorization.token.JwtEncodingContext;
 import org.springframework.security.oauth2.server.authorization.token.OAuth2TokenCustomizer;
@@ -54,10 +56,13 @@ public class TokenCustomizer implements OAuth2TokenCustomizer<JwtEncodingContext
 
   private Set<String> determineRoles(final Authentication authentication) {
     final Object principal = authentication.getPrincipal();
-    // No clue yet how this'll work for federated users (perhaps using OAuth2User as first check?), so for now only local
     if (principal instanceof final User user) {
       // Assume local user, and retrieve roles accordingly
       return repository.retrieveUserRoles("local", user.getUsername());
+    } else if (authentication instanceof final OAuth2AuthenticationToken token
+        && principal instanceof final DefaultOidcUser user) {
+      // Obtain roles based on our local client registration ID, and the subject which should be unique
+      return repository.retrieveUserRoles(token.getAuthorizedClientRegistrationId(), user.getSubject());
     } else {
       return Set.of();
     }
@@ -68,6 +73,10 @@ public class TokenCustomizer implements OAuth2TokenCustomizer<JwtEncodingContext
     if (principal instanceof final User user) {
       // Assume local user, and retrieve authorities accordingly
       return repository.retrieveCompetentAuthorities("local", user.getUsername());
+    } else if (authentication instanceof final OAuth2AuthenticationToken token
+        && principal instanceof final DefaultOidcUser user) {
+      // Obtain authorities based on our local client registration ID, and the subject which should be unique
+      return repository.retrieveCompetentAuthorities(token.getAuthorizedClientRegistrationId(), user.getSubject());
     } else {
       return Set.of();
     }
