@@ -105,7 +105,8 @@ public class SecurityConfig {
         .authorizeHttpRequests(authorize -> authorize.anyRequest().authenticated());
     if (useFormLogin) {
       // Form login handles the redirect to the login page from the authorization server filter chain
-      http.formLogin(Customizer.withDefaults());
+      http.formLogin(Customizer.withDefaults())
+          .logout(Customizer.withDefaults());
     }
     if (useFederation) {
       http.oauth2Login()
