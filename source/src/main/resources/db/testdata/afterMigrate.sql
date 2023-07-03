@@ -1,6 +1,7 @@
 -- Script run after each migration, so each time the application is started.
 -- Ensure queries are runnable multiple times.
 
+-- Local test users
 INSERT INTO auth.local_users (username, password)
 VALUES 
 	('testviewer', '{bcrypt}$2a$12$sG0hLLmx3/3Mjts69Y1Lp.B.EXCH51dnUxkRPXQ2RJ8tsrbU4OsqS'),
@@ -61,4 +62,9 @@ SELECT
 		INNER JOIN auth.competent_authorities USING (code)
 	
 	WHERE identity_providers.name = 'local'
+	ON CONFLICT DO NOTHING;
+
+-- Cognito identity provider
+INSERT INTO auth.identity_providers (name)
+VALUES ('aercognito')
 	ON CONFLICT DO NOTHING;
