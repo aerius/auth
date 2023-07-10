@@ -24,7 +24,7 @@ TEMP_FILE=$(mktemp)
 htpasswd -Bbn "$USERNAME" "$PLAIN_PASSWORD" > "$TEMP_FILE"
 
 # Extract just the hash from the output
-# Cut -d: -f2 removes the username and colon at the start, and rev | cut -c4- | rev removes the last three characters
+# Cut -d: -f2 removes the username and colon at the start
 BCRYPT_HASH=$(cut -d: -f2 "$TEMP_FILE")
 
 # Clean up the temporary file
