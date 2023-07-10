@@ -25,7 +25,7 @@ htpasswd -Bbn "$USERNAME" "$PLAIN_PASSWORD" > "$TEMP_FILE"
 
 # Extract just the hash from the output
 # Cut -d: -f2 removes the username and colon at the start, and rev | cut -c4- | rev removes the last three characters
-BCRYPT_HASH=$(cut -d: -f2 "$TEMP_FILE" | rev | cut -c4- | rev)
+BCRYPT_HASH=$(cut -d: -f2 "$TEMP_FILE")
 
 # Clean up the temporary file
 rm "$TEMP_FILE"
