@@ -4,7 +4,7 @@
 DBNAME="aerius_authorization"
 DBUSER="aerius"
 DBPASS="aerius"
-DBHOST="localhost"  # Assuming your database is on the same machine. Change if needed.
+DBHOST="localhost"
 
 export PGPASSWORD=$DBPASS
 
