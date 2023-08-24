@@ -49,7 +49,7 @@ SELECT
 WITH test_users AS (
 SELECT 
 	unnest(ARRAY['testviewer', 'viewer', 'editor', 'superuser', 'admin', 'special']) AS identity_provider_reference,
-	unnest(ARRAY['PROVINCIE_OVERIJSSEL', 'PROVINCIE_UTRECHT', 'PROVINCIE_UTRECHT', 'MINISTERIE_LNV', 'MINISTERIE_LNV', 'MINISTERIE_LNV']) AS code
+	unnest(ARRAY['PROVINCIE_OVERIJSSEL', 'PROVINCIE_UTRECHT', 'PROVINCIE_UTRECHT', 'MINISTERIE_LNV', 'MINISTERIE_LNV', 'PROVINCIE_UTRECHT']) AS code
 )
 INSERT INTO auth.user_competent_authorities (user_id, competent_authority_id)
 SELECT
