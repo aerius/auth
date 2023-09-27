@@ -10,7 +10,7 @@ VALUES
 	('superuser', '{bcrypt}$2a$12$/Zrv8cXcvruG.eGgCl1yl.QVNsjrmMjOFgj20aKTLvUqypZtJYisC'),
 	('admin', '{bcrypt}$2a$12$.dzrMeJ6s2GzFtB.5uUIsenqYhBxAXLBbRE4pYdKEJAMrPwqGhFEi'),
 	('special', '{bcrypt}$2a$12$1Zqh2OSxja5tYnD3PysgNeunLI7cYcoNfiLUcIZfoxKqg3ZoXccLy'),
-	('labelmanager', '{bcrypt}$2a$12$ft1Ux/EehVjK7wY0zT8Bke8aaGRqnoheL9LDOqIa1iHtrMLUegJM.'),
+	('labelmanager', '{bcrypt}$2a$12$ft1Ux/EehVjK7wY0zT8Bke8aaGRqnoheL9LDOqIa1iHtrMLUegJM.')
 	ON CONFLICT DO NOTHING;
 
 WITH test_users AS (
