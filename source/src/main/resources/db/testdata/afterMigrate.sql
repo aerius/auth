@@ -9,12 +9,13 @@ VALUES
 	('editor', '{bcrypt}$2a$12$PLYDm40MTcnyza65qQn3xeiWnj.mopUf2eKcjjAHiqBWc31E13jke'),
 	('superuser', '{bcrypt}$2a$12$/Zrv8cXcvruG.eGgCl1yl.QVNsjrmMjOFgj20aKTLvUqypZtJYisC'),
 	('admin', '{bcrypt}$2a$12$.dzrMeJ6s2GzFtB.5uUIsenqYhBxAXLBbRE4pYdKEJAMrPwqGhFEi'),
-	('special', '{bcrypt}$2a$12$1Zqh2OSxja5tYnD3PysgNeunLI7cYcoNfiLUcIZfoxKqg3ZoXccLy')
+	('special', '{bcrypt}$2a$12$1Zqh2OSxja5tYnD3PysgNeunLI7cYcoNfiLUcIZfoxKqg3ZoXccLy'),
+	('labelmanager', '{bcrypt}$2a$12$ft1Ux/EehVjK7wY0zT8Bke8aaGRqnoheL9LDOqIa1iHtrMLUegJM.'),
 	ON CONFLICT DO NOTHING;
 
 WITH test_users AS (
 SELECT 
-	unnest(ARRAY['testviewer', 'viewer', 'editor', 'superuser', 'admin', 'special']) AS username
+	unnest(ARRAY['testviewer', 'viewer', 'editor', 'superuser', 'admin', 'special', 'labelmanager']) AS username
 )
 INSERT INTO auth.users (identity_provider_id, identity_provider_reference)
 SELECT
@@ -30,8 +31,8 @@ SELECT
 
 WITH test_users AS (
 SELECT 
-	unnest(ARRAY['testviewer', 'viewer', 'editor', 'superuser', 'admin', 'special']) AS identity_provider_reference,
-	unnest(ARRAY['VIEWER', 'VIEWER', 'EDITOR', 'SUPER_USER', 'ADMIN', 'SPECIAL']) AS code
+	unnest(ARRAY['testviewer', 'viewer', 'editor', 'superuser', 'admin', 'special', 'labelmanager']) AS identity_provider_reference,
+	unnest(ARRAY['VIEWER', 'VIEWER', 'EDITOR', 'SUPER_USER', 'ADMIN', 'SPECIAL', 'LABEL_MANAGER']) AS code
 )
 INSERT INTO auth.user_roles (user_id, role_id)
 SELECT
@@ -48,8 +49,8 @@ SELECT
 
 WITH test_users AS (
 SELECT 
-	unnest(ARRAY['testviewer', 'viewer', 'editor', 'superuser', 'admin', 'special']) AS identity_provider_reference,
-	unnest(ARRAY['PROVINCIE_OVERIJSSEL', 'PROVINCIE_UTRECHT', 'PROVINCIE_UTRECHT', 'PROVINCIE_UTRECHT', 'MINISTERIE_LNV', 'MINISTERIE_LNV']) AS code
+	unnest(ARRAY['testviewer', 'viewer', 'editor', 'superuser', 'admin', 'special', 'labelmanager']) AS identity_provider_reference,
+	unnest(ARRAY['PROVINCIE_OVERIJSSEL', 'PROVINCIE_UTRECHT', 'PROVINCIE_UTRECHT', 'PROVINCIE_UTRECHT', 'MINISTERIE_LNV', 'MINISTERIE_LNV', 'MINISTERIE_LNV']) AS code
 )
 INSERT INTO auth.user_competent_authorities (user_id, competent_authority_id)
 SELECT
