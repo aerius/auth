@@ -9,12 +9,13 @@ VALUES
 	('editor', '{bcrypt}$2a$12$PLYDm40MTcnyza65qQn3xeiWnj.mopUf2eKcjjAHiqBWc31E13jke'),
 	('superuser', '{bcrypt}$2a$12$/Zrv8cXcvruG.eGgCl1yl.QVNsjrmMjOFgj20aKTLvUqypZtJYisC'),
 	('admin', '{bcrypt}$2a$12$.dzrMeJ6s2GzFtB.5uUIsenqYhBxAXLBbRE4pYdKEJAMrPwqGhFEi'),
-	('special', '{bcrypt}$2a$12$1Zqh2OSxja5tYnD3PysgNeunLI7cYcoNfiLUcIZfoxKqg3ZoXccLy')
+	('special', '{bcrypt}$2a$12$1Zqh2OSxja5tYnD3PysgNeunLI7cYcoNfiLUcIZfoxKqg3ZoXccLy'),
+	('archive', '{bcrypt}$2y$10$PYCLCZxlsxbK1sToeWK0ee84.bkA7rdMSiTF8PLJJO/5Co0J5IVP2')
 	ON CONFLICT DO NOTHING;
 
 WITH test_users AS (
 SELECT 
-	unnest(ARRAY['testviewer', 'viewer', 'editor', 'superuser', 'admin', 'special']) AS username
+	unnest(ARRAY['testviewer', 'viewer', 'editor', 'superuser', 'admin', 'special', 'archive']) AS username
 )
 INSERT INTO auth.users (identity_provider_id, identity_provider_reference)
 SELECT
@@ -30,8 +31,8 @@ SELECT
 
 WITH test_users AS (
 SELECT 
-	unnest(ARRAY['testviewer', 'viewer', 'editor', 'superuser', 'admin', 'special']) AS identity_provider_reference,
-	unnest(ARRAY['VIEWER', 'VIEWER', 'EDITOR', 'SUPER_USER', 'ADMIN', 'SPECIAL']) AS code
+	unnest(ARRAY['testviewer', 'viewer', 'editor', 'superuser', 'admin', 'special', 'archive']) AS identity_provider_reference,
+	unnest(ARRAY['VIEWER', 'VIEWER', 'EDITOR', 'SUPER_USER', 'ADMIN', 'SPECIAL', 'ARCHIVE']) AS code
 )
 INSERT INTO auth.user_roles (user_id, role_id)
 SELECT
