@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
 
-    Copyright the State of the Netherlands
+    Copyright (c) Contributors to the project
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU Affero General Public License as published by
@@ -38,6 +38,13 @@
     <flyway-maven-plugin.version>3.0</flyway-maven-plugin.version>
     <jooq-codegen-maven.version>3.17.12</jooq-codegen-maven.version>
   </properties>
+
+  <contributors>
+    <contributor>
+      <organization>Ministry of Agriculture, Fisheries, Food Security and Nature</organization>
+      <organizationUrl>https://www.government.nl/ministries/ministry-of-agriculture-fisheries-food-security-and-nature</organizationUrl>
+    </contributor>
+  </contributors>
 
   <scm>
     <connection>scm:git:ssh://git@github.com:aerius/auth.git</connection>
